@@ -1,0 +1,6 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+# Build artifacts — binaries are not tracked; ship source instead.
+*.exe

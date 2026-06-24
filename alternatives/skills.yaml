@@ -1,0 +1,7 @@
+# Optional third-party skill packs that are not vendored in this repo.
+alternative_skills:
+  - name: superpowers
+    source: https://github.com/obra/superpowers
+    version_seen: 5.1.0
+    local_cache_seen: ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0
+    description: Core skills library for Claude Code and Codex workflows, including planning, TDD, debugging, code review, and delivery patterns.
