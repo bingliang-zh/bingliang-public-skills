@@ -3,9 +3,10 @@
     Windows notification sound for the "stop-sound" hook.
 
 .DESCRIPTION
-    Invoked as:  powershell -ExecutionPolicy Bypass -File stop-sound.ps1 --trigger
+    Invoked as:
+      powershell -ExecutionPolicy Bypass -File stop-sound.ps1 --trigger --sound path\to\sound.mp3
 
-    Plays mambo.mp3 (expected to sit next to this script) using the .NET
+    Plays the requested MP3 using the .NET
     WPF MediaPlayer, blocking until the clip finishes. If media playback is
     unavailable for any reason, it falls back to the system beep so the user
     still gets an audible signal.
@@ -31,8 +32,31 @@ if (-not ($Arguments -contains '--trigger')) {
     exit 0
 }
 
-# Resolve the sound file relative to this script's own location.
-$soundPath = Join-Path -Path $PSScriptRoot -ChildPath 'mambo.mp3'
+function Get-ArgumentValue {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]] $InputArguments,
+
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    for ($index = 0; $index -lt $InputArguments.Count; $index++) {
+        if ($InputArguments[$index] -eq $Name -and ($index + 1) -lt $InputArguments.Count) {
+            return $InputArguments[$index + 1]
+        }
+    }
+
+    return $null
+}
+
+$requestedSoundPath = Get-ArgumentValue -InputArguments $Arguments -Name '--sound'
+if ([string]::IsNullOrWhiteSpace($requestedSoundPath)) {
+    # Backward-compatible fallback for older generated hook commands.
+    $requestedSoundPath = Join-Path -Path $PSScriptRoot -ChildPath 'sounds\mambo.mp3'
+}
+
+$soundPath = $requestedSoundPath
 
 function Invoke-Fallback {
     # Built-in system sound; works even without the audio file or an MP3 codec.
@@ -41,6 +65,8 @@ function Invoke-Fallback {
 }
 
 try {
+    $soundPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($requestedSoundPath)
+
     if (-not (Test-Path -LiteralPath $soundPath)) {
         throw "sound asset not found: $soundPath"
     }

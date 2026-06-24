@@ -3,7 +3,8 @@
   "description": "Play a local notification sound when the agent reaches a stop/completion event.",
   "event": "Stop",
   "params": {
-    "sound_asset": "mambo.mp3"
+    "sound_asset": "sounds/mambo.mp3",
+    "sound_catalog": "sounds.yaml"
   },
   "platforms": {
     "darwin": {
@@ -13,7 +14,7 @@
       },
       "action": {
         "type": "command",
-        "command_template": "{player_command} {asset_path}"
+        "command_template": "{player_command} \"{asset_path}\""
       }
     },
     "windows": {
@@ -24,15 +25,11 @@
         {
           "source": "stop-sound.ps1",
           "target": "{codex_root}\\stop-sound.ps1"
-        },
-        {
-          "source": "mambo.mp3",
-          "target": "{codex_root}\\mambo.mp3"
         }
       ],
       "action": {
         "type": "command",
-        "command_template": "powershell -NoProfile -ExecutionPolicy Bypass -File {codex_root}\\stop-sound.ps1 --trigger"
+        "command_template": "powershell -NoProfile -ExecutionPolicy Bypass -File \"{codex_root}\\stop-sound.ps1\" --trigger --sound \"{asset_path}\""
       }
     }
   }

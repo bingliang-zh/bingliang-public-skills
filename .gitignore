@@ -2,5 +2,8 @@
 __pycache__/
 *.pyc
 
-# Build artifacts — binaries are not tracked; ship source instead.
+# Local tool caches and downloaded audio.
+tools/bilibili-audio-slicer/.work/
+
+# Build artifacts - binaries are not tracked; ship source instead.
 *.exe

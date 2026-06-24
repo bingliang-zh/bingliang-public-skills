@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bilibili Audio Slicer</title>
+    <link rel="stylesheet" href="/app.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Bilibili Audio Slicer</h1>
+          <p id="health">Checking local tools...</p>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="url-row">
+          <label class="field grow">
+            <span>Bilibili URL</span>
+            <input id="videoUrl" type="url" placeholder="https://www.bilibili.com/video/..." autocomplete="off">
+          </label>
+          <label class="field cookies">
+            <span>Cookies</span>
+            <textarea id="cookies" rows="2" placeholder="chrome, edge, firefox, C:\Tools\cookies.txt, or pasted cookies.txt content"></textarea>
+          </label>
+          <button id="downloadBtn" class="primary" type="button">Load Audio</button>
+        </div>
+        <div id="status" class="status">Ready.</div>
+      </section>
+
+      <section class="workspace">
+        <div class="wave-panel">
+          <div class="media-row">
+            <audio id="audio" controls preload="metadata"></audio>
+            <button id="playSelectionBtn" type="button">Play Selection</button>
+          </div>
+          <canvas id="waveform" width="1200" height="280"></canvas>
+          <div class="zoom-row">
+            <label class="field zoom-field">
+              <span>Zoom</span>
+              <input id="zoomLevel" type="range" min="1" max="20" step="0.1" value="1">
+            </label>
+            <output id="zoomLabel">1.0x</output>
+            <label class="field pan-field">
+              <span>Position</span>
+              <input id="panPosition" type="range" min="0" max="1" step="0.001" value="0">
+            </label>
+          </div>
+          <div class="time-row">
+            <label class="field">
+              <span>Start</span>
+              <input id="startTime" type="number" min="0" step="0.001" value="0">
+            </label>
+            <label class="field">
+              <span>End</span>
+              <input id="endTime" type="number" min="0" step="0.001" value="0">
+            </label>
+            <output id="durationLabel">0.000s</output>
+          </div>
+        </div>
+
+        <aside class="export-panel">
+          <label class="field">
+            <span>ID</span>
+            <input id="clipId" type="text" placeholder="sound-id">
+          </label>
+          <label class="check">
+            <input id="updateCatalog" type="checkbox" checked>
+            <span>Update sounds.yaml</span>
+          </label>
+          <button id="exportBtn" class="primary" type="button">Export Clip</button>
+          <div id="exportResult" class="result"></div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
