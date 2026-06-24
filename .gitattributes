@@ -1,0 +1,9 @@
+# Normalize line endings so clones are byte-identical regardless of the
+# consumer's core.autocrlf setting. The bingliang-skills installer compares
+# these files byte-for-byte against what it installs, so they must not gain
+# CRLF on checkout.
+* text=auto eol=lf
+
+# Binary assets — never touch.
+*.mp3 binary
+*.exe binary
