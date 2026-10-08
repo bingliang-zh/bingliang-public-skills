@@ -7,6 +7,21 @@
     "sound_catalog": "sounds.yaml"
   },
   "platforms": {
+    "linux": {
+      "params": {
+        "timeout_seconds": 10
+      },
+      "install_assets": [
+        {
+          "source": "stop-sound.sh",
+          "target": "{codex_root}/stop-sound.sh"
+        }
+      ],
+      "action": {
+        "type": "command",
+        "command_template": "bash \"{codex_root}/stop-sound.sh\" --trigger --sound \"{asset_path}\""
+      }
+    },
     "darwin": {
       "params": {
         "player_command": "afplay",

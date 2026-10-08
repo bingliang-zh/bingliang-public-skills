@@ -1,0 +1,26 @@
+name: Linux hooks
+
+on:
+  push:
+    paths:
+      - hooks/**
+      - tests/**
+      - .github/workflows/linux-hooks.yml
+  pull_request:
+    paths:
+      - hooks/**
+      - tests/**
+      - .github/workflows/linux-hooks.yml
+
+permissions:
+  contents: read
+
+jobs:
+  stop-sound:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Bash syntax
+        run: bash -n hooks/stop-sound/stop-sound.sh
+      - name: Test Linux hook without a desktop audio session
+        run: python3 -m unittest discover -s tests -v

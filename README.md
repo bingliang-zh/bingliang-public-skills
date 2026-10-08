@@ -26,16 +26,72 @@ from them.
 
 | Hook | Spec | Assets |
 | --- | --- | --- |
-| `stop-sound` | `hooks/stop-sound/spec.json` | `hooks/stop-sound/sounds/*.mp3`, `hooks/stop-sound/sounds.yaml`, `hooks/stop-sound/stop-sound.ps1` |
+| `stop-sound` | `hooks/stop-sound/spec.json` | `hooks/stop-sound/sounds/*.mp3`, `hooks/stop-sound/sounds.yaml`, `hooks/stop-sound/stop-sound.ps1`, `hooks/stop-sound/stop-sound.sh` |
 
 ### `stop-sound`
 
 Plays a local notification sound when the agent reaches a stop/completion event.
 
 - **macOS**: plays the selected sound via `afplay`.
+- **Linux / Ubuntu**: runs `stop-sound.sh` with Bash and GNU coreutils
+  `timeout`. Tries `pw-play`, `ffplay`, `mpv`, `mpg123`, then `gst-play-1.0`,
+  falling back when a backend or its MP3 codec/audio session is unavailable.
+  Playback has a shared 8-second budget plus a 1-second kill grace. Missing
+  audio or players produce a diagnostic on stderr but do not block completion.
+  A desktop audio session is required; headless machines may have no audio sink.
 - **Windows**: runs `stop-sound.ps1`, which plays the selected sound with the
   .NET `MediaPlayer` and falls back to a system sound if playback fails. The
   script is the source of record; no compiled binary is committed.
+
+#### Linux Installation and Testing
+
+The consuming generator can now select `platforms.linux`. For a manual install,
+run these commands from this repository's root:
+
+```sh
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/sounds"
+cp hooks/stop-sound/stop-sound.sh "${CODEX_HOME:-$HOME/.codex}/"
+cp hooks/stop-sound/sounds/*.mp3 "${CODEX_HOME:-$HOME/.codex}/sounds/"
+cp hooks/stop-sound/sounds.yaml "${CODEX_HOME:-$HOME/.codex}/sounds.yaml"
+bash "${CODEX_HOME:-$HOME/.codex}/stop-sound.sh" --trigger \
+  --sound "${CODEX_HOME:-$HOME/.codex}/sounds/mambo.mp3"
+```
+
+Try the installed hook before installing extra dependencies. If none of the
+available players can decode the bundled MP3, Ubuntu users can install a fallback
+with `sudo apt-get install ffmpeg` (provides `ffplay`).
+
+For Codex, merge this entry into `~/.codex/hooks.json` (do not overwrite existing
+hooks). Replace `/home/YOU/.codex` with your actual Codex root:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"/home/YOU/.codex/stop-sound.sh\" --trigger --sound \"/home/YOU/.codex/sounds/mambo.mp3\"; printf '{}\\n'",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The Codex adapter prints an empty JSON object because `Stop` expects JSON output;
+the player helper itself remains CLI-neutral. Start a new session and review and
+trust the hook via `/hooks` before expecting automatic playback. See the
+[official hook documentation](https://learn.chatgpt.com/docs/hooks).
+
+Run hermetic regression tests (including unavailable/failed/hanging players):
+
+```sh
+python3 -m unittest discover -s tests -v
+```
 
 #### Adding More Stop Sounds
 
