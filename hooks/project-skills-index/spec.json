@@ -1,0 +1,14 @@
+{
+  "name": "project-skills-index",
+  "description": "Index child repositories' local skills at session startup; warn when a restart is needed.",
+  "event": "SessionStart",
+  "params": {"timeout_seconds": 15},
+  "install_assets": [
+    {"source": "index_skills.py", "target": "{codex_root}/hooks/scripts/index_project_skills.py"}
+  ],
+  "action": {
+    "type": "command",
+    "command_template": "python3 \"{codex_root}/hooks/scripts/index_project_skills.py\""
+  },
+  "platforms": {"darwin": {}, "linux": {}}
+}

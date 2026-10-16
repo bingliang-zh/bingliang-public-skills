@@ -201,3 +201,36 @@ Then open `http://127.0.0.1:8765`. The tool requires local `yt-dlp` and
 Alternative third-party skill packs are tracked in `alternatives/skills.yaml` by
 name and source. They are listed for awareness and are not vendored into this
 repository.
+
+### `project-skills-index`
+
+On macOS/Linux, runs on `SessionStart` and indexes skills from immediate child
+Git repositories of the session's working directory. This supports starting an
+agent in a parent workspace rather than inside one repository. It needs Python
+3.8+ and performs no network requests or model calls.
+
+- Source entrypoints: `<workspace>/<repo>/.agents/skills/<name>/SKILL.md`.
+  Git worktrees (`.git` files) and repo-local skill symlinks are supported.
+- Workspace entrypoints: `<workspace>/.agents/skills/<name>` are relative symlinks
+  to the canonical repo-owned directories. Source content is never copied.
+- Repository-scoped sessions are left alone; discovery is not a recursive scan
+  of arbitrary files, nested repos, plugin caches, or user-level skills.
+- Matching pre-existing links are adopted. Only recorded, unchanged managed
+  links can be replaced or removed; other entries are preserved. Duplicate
+  source names or destination conflicts produce a warning without overwriting.
+- New/retargeted/removed links produce a `systemMessage` asking for a session
+  restart. Unchanged links produce no output, including after restarting.
+  The hook skips compaction events. It does not restart or stop the agent.
+- Ownership is recorded in `.agents/project-skills-index.json` beside the index.
+  A lock serializes simultaneous sessions. Keep this generated workspace index
+  local; only the repo entrypoints belong in project version control.
+- In Codex, review and trust the new hook through `/hooks` before it can run.
+  Runtime configuration uses the superset installer, which preserves the spec's
+  command and installs the Python script into the selected TUI's hook directory.
+
+Manual refresh (optional, run from this repository):
+
+```sh
+python3 hooks/project-skills-index/index_skills.py --root /path/to/workspace
+python3 -m unittest discover -s hooks/project-skills-index -p 'test_*.py' -v
+```
